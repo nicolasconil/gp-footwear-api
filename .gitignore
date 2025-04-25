@@ -1,0 +1,40 @@
+# Node modules
+/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+
+# Build output
+/dist
+/build
+
+# Ignore uploads and invoices folders, but keep the .gitkeep files
+/uploads/*
+!/uploads/.gitkeep
+/invoices/*
+!/invoices/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+
+# Dependency directories
+jspm_packages/
+
+# Misc
+*.sublime-workspace
+*.sublime-project
+
+# Ignore your “to-do” markdown
+stepstofollow.md
