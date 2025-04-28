@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { verificationEmailTemplate, orderConfirmationEmailTemplate } from '../utils/emailTemplates';
+import { verificationEmailTemplate, orderConfirmationEmailTemplate, sendShippingNotificationEmailTemplate } from '../utils/emailTemplates';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -20,20 +20,20 @@ export const sendEmail = async ({ to, subject, html, attachments = [] }) => {
     await transporter.sendMail(mailOptions);
 }
 
-export const sendVerificationEmail = async (email, verificationUrl) => {
-    const html = verificationEmailTemplate(verificationUrl);
+export const sendVerificationEmail = async (email, name, verificationUrl) => {
+    const { subject, text, html } = verificationEmailTemplate(name, verificationUrl);
     await sendEmail({
         to: email,
-        subject: 'Verificación de correo',
+        subject,
         html
     });
 };
 
-export const sendOrderConfirmationEmail = async (email, orderId, pdfPath) => {
-    const html = orderConfirmationEmailTemplate(orderId);
+export const sendOrderConfirmationEmail = async (email, name, orderId, total, shippingCost, pdfPath) => {
+    const { subject, text, html } = orderConfirmationEmailTemplate(orderId);
     await sendEmail({
         to: email,
-        subject: 'Confirmación de pedido',
+        subject,
         html,
         attachments: [
             {
@@ -46,5 +46,9 @@ export const sendOrderConfirmationEmail = async (email, orderId, pdfPath) => {
 
 export const sendShippingNotificationEmail = async (email, name, orderId, trackingNumber, carrier) => {
     const { subject, text, html } = sendShippingNotificationEmailTemplate (name, orderId, trackingNumber, carrier);
-    await sendEmail(email, subject, text, html);
+    await sendEmail({
+        to: email,
+        subject,
+        html
+    });
 };

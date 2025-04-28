@@ -1,8 +1,8 @@
 export const verificationEmailTemplate = (name, url) => {
-    return {
-        subject: 'Verifica tu correo en GP Footwear',
-        text: `¡Hola ${name}! verifica tu correo copiando y pegando este enlace en tu navegador: \n\n${url}`,
-        html: `
+  return {
+    subject: 'Verifica tu correo en GP Footwear',
+    text: `¡Hola ${name}! verifica tu correo copiando y pegando este enlace en tu navegador: \n\n${url}`,
+    html: `
             <div style='font-family: Arial, sans-serif; line-height:1.6; color: #333;">
             <h2> ¡Hola ${name}! </h2>
             <p> Gracias por registrarte en <strong> GP Footwear </strong>. Para completar tu registro, por favor hace click en el botón: </p>
@@ -20,14 +20,14 @@ export const verificationEmailTemplate = (name, url) => {
             <p> Si no solicitaste este correo, podes ignorarlo. </p>                    
             </div>
         `
-    };
+  };
 };
 
 export const passwordResetEmailTemplate = (name, url) => {
-    return {
-        subject: 'Recuperación de contraseña GP Footwear',
-        text: `¡Hola ${name}! Solicitaron restablecer tu contraseña. Usa este enlace:\n\n${url}`,
-        html: `
+  return {
+    subject: 'Recuperación de contraseña GP Footwear',
+    text: `¡Hola ${name}! Solicitaron restablecer tu contraseña. Usa este enlace:\n\n${url}`,
+    html: `
             <div style="font-family: Arial, sans-serif; color: #333;">
             <h2> ¡Hola ${name}! </h2>
             <p> Recibimos una solicitud para restablecer tu contraseña. Hace click en el botón si fuiste vos: </p>
@@ -44,25 +44,25 @@ export const passwordResetEmailTemplate = (name, url) => {
         <p> Si no solicitaste este cambio, ignora este correo. </p>
       </div>
     `
-    };
+  };
 };
 
 export const orderConfirmationEmailTemplate = (name, orderId, total, shippingCost) => {
-    return {
-      subject: `Tu pedido ${orderId} ha sido recibido`,
-      text: `¡Hola ${name}! Gracias por tu compra. Tu total es $${total}. El costo del envío es $${shippingCost}. Adjuntamos la factura.`,
-      html: `
+  return {
+    subject: `Tu pedido ${orderId} ha sido recibido`,
+    text: `¡Hola ${name}! Gracias por tu compra. Tu total es $${total}. El costo del envío es $${shippingCost}. Adjuntamos la factura.`,
+    html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
         <h2> Gracias por tu compra, ${name}! </h2>
         <p> Recibimos tu pedido <strong> #${orderId} </strong>. </p>
         <p> Importe total: <strong> $${total} </strong> </p>
-        <p> Costo de envío: <strong> $${shippingCost  } </strong> </p>
+        <p> Costo de envío: <strong> $${shippingCost} </strong> </p>
         <p> Adjuntamos la factura en PDF para tu registro. </p>
         <p> ¡Te avisaremos cuando tu pedido esté en camino! </p>
         </div>
       `
-    };
   };
+};
 
 export const sendShippingNotificationEmailTemplate = (name, orderId, trackingNumber, carrier) => {
   return {
@@ -88,5 +88,24 @@ export const sendShippingNotificationEmailTemplate = (name, orderId, trackingNum
             <p> ¡Gracias por elegir GP Footwear! </p>
         </div>
       `
-    };
+  };
+};
+
+export const promoEmailTemplate = (subject, content) => {
+  return `
+    <html>
+      <body style="font-family: Arial, sans-serif; background-color: #f8f8f8;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px;">
+          <h2 style="color: #2c3e50; text-align: center;">${subject}</h2>
+          <div style="padding: 20px; font-size: 16px; line-height: 1.6;">
+            ${content}
+          </div>
+          <footer style="text-align: center; margin-top: 20px; font-size: 12px;">
+            <p style="color: #7f8c8d;">Gracias por ser parte de nuestra comunidad.</p>
+            <p style="color: #7f8c8d;">Si no deseas recibir más correos de promociones, puedes darte de baja aquí.</p>
+          </footer>
+        </div>
+      </body>
+    </html>
+  `;
 };
