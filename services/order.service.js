@@ -1,10 +1,12 @@
 import * as OrderRepository from '../repositories/order.repository.js';
 import { generateInvoice } from '../utils/invoiceGenerator.js';
-import { sendOrderConfirmationEmail } from '../middleware/email.middleware.js';
+import { getShippingRate } from './carriers/andreani.service.js';
+import { sendOrderConfirmationEmail, sendShippingNotificationEmail } from '../middleware/email.middleware.js';
 import path from 'path';
 
 export const create = async (orderData) => {
-    const order = await OrderRepository.createOrder(orderData);
+    const shippingCost = await getShippingRate(orderData.destinationPostalCode);
+    const order = await OrderRepository.createOrder({ ...orderData, shippingCost: shippingCost });
     try {
         const invoicePath = path.resolve(
             process.cwd(),
@@ -16,6 +18,7 @@ export const create = async (orderData) => {
             await sendOrderConfirmationEmail(
                 order.user.email,
                 order._id,
+                order.totalAmount,
                 invoicePath
             );
         }
@@ -54,3 +57,42 @@ export const updatePaymentInfo = async (orderId, paymentInfo) => {
     };
     return await OrderRepository.updateOrder(orderId, updateData);    
 };
+
+export const updateFields = async (id, fields) => {
+    const updateOrder = await OrderRepository.updateOrder(id, fields);
+    if (fields.status && (fields.status === 'enviado' || fields.status === 'entregado')) {
+        try {
+            if (updateOrder.user) {
+                await sendShippingNotificationEmail (
+                    updateOrder.user.email,
+                    updateOrder._id,
+                    updateOrder.shippingTrackingNumber,
+                    updateOrder.shippingMethod
+                );
+            }
+        } catch (error) {
+            console.error('Error enviando la notificación de envío: ', error);
+        }
+    };
+    return updateOrder;
+};
+
+export const dispatchOrder = async (id, shippingTrackingNumber) => {
+    const order = await OrderRepository.dispatchOrder(id, shippingTrackingNumber);
+    if (!order) {
+        throw new Error('Orden no encontrada para despachar');
+    }
+    try {
+        if (order.user) {
+            await sendShippingNotificationEmail(
+                order.user.email,
+                order._id,
+                order.shippingTrackingNumber,
+                order.shippingMethod
+            );
+        }
+    } catch (error) {
+        console.error('Error enviando email de despacho: ', error);
+    }
+    return order;
+}

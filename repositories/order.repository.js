@@ -1,4 +1,4 @@
-import Order from '../models/order.model,js';
+import Order from '../models/order.model.js';
 
 export const createOrder = async (data) => {
     return await Order.create(data);
@@ -21,7 +21,7 @@ export const deleteOrder = async (id) => {
 };
 
 export const getOrdersByUserId = async (userId) => {
-    return await Order.find({ user: userId}).populate('items.product');
+    return await Order.find({ user: userId}).populate('user').populate('products.product');
 };
 
 export const updateOrder = async (id, updateData) => {

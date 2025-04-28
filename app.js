@@ -9,6 +9,7 @@ import userRoute from './routes/user.route.js';
 import authRoute from './routes/auth.route.js';
 import orderRoute from './routes/order.route.js';
 import stockMovementRoute from './routes/stockMovement.route.js';
+import shippingRoute from './routes/shipping.route.js';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -60,6 +61,7 @@ app.use('/user', userRoute);
 app.use('/auth', authRoute);
 app.use('/orders', orderRoute);
 app.use('/', stockMovementRoute);
+app.use('/api/shipping', shippingRoute);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada' });

@@ -1,8 +1,3 @@
-/**
- * @param {String} name     Nombre de usuario
- * @param {String} url      URL de verificación
- */
-
 export const verificationEmailTemplate = (name, url) => {
     return {
         subject: 'Verifica tu correo en GP Footwear',
@@ -28,11 +23,6 @@ export const verificationEmailTemplate = (name, url) => {
     };
 };
 
-/**
- * @param {String} name
- * @param {String} url
- */
-
 export const passwordResetEmailTemplate = (name, url) => {
     return {
         subject: 'Recuperación de contraseña GP Footwear',
@@ -57,24 +47,46 @@ export const passwordResetEmailTemplate = (name, url) => {
     };
 };
 
-/**
- * @param {String} name 
- * @param {String} orderId 
- * @param {Number} total 
- */
-
-export const orderConfirmationEmailTemplate = (name, orderId, total) => {
+export const orderConfirmationEmailTemplate = (name, orderId, total, shippingCost) => {
     return {
       subject: `Tu pedido ${orderId} ha sido recibido`,
-      text: `¡Hola ${name}! Gracias por tu compra. Tu total es $${total}. Adjuntamos la factura.`,
+      text: `¡Hola ${name}! Gracias por tu compra. Tu total es $${total}. El costo del envío es $${shippingCost}. Adjuntamos la factura.`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
         <h2> Gracias por tu compra, ${name}! </h2>
         <p> Recibimos tu pedido <strong> #${orderId} </strong>. </p>
         <p> Importe total: <strong> $${total} </strong> </p>
+        <p> Costo de envío: <strong> $${shippingCost  } </strong> </p>
         <p> Adjuntamos la factura en PDF para tu registro. </p>
         <p> ¡Te avisaremos cuando tu pedido esté en camino! </p>
         </div>
       `
     };
   };
+
+export const sendShippingNotificationEmailTemplate = (name, orderId, trackingNumber, carrier) => {
+  return {
+    subject: `Tu pedido ${orderId} fue enviado 🚚`,
+    text: `¡Hola ${name}! Tu pedido ya fue despachado.\n\nTransportista: ${carrier || 'No disponible'}\nNúmero de seguimiento: ${trackingNumber || 'No disponible'}.`,
+    html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+            <h2> ¡Hola ${name}! </h2>
+            <p> Queríamos contarte que tu pedido <strong>#${orderId}</strong> ya fue despachado. </p>
+            <p> Transportista: <strong>${carrier || 'No disponible'}</strong> </p>
+            <p> Número de seguimiento: <strong>${trackingNumber || 'No disponible'}</strong> </p>
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="https://www.correoargentino.com.ar/formularios/ondnc" 
+                    style="background-color: #4CAF50;
+                           color: #fff;
+                           padding: 12px 20px;
+                           text-decoration: none;
+                           border-radius: 5px;
+                           display: inline-block;">
+                    Seguir mi envío
+                </a>
+            </p>
+            <p> ¡Gracias por elegir GP Footwear! </p>
+        </div>
+      `
+    };
+};

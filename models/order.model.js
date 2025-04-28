@@ -20,32 +20,49 @@ const OrderSchema = new mongoose.Schema({
         color: String,
         price: Number
     }],
-    shippingAddress: {
-        street: String,
-        number: String,
-        floor: String,
-        apartment: String,
-        city: String,
-        province: String,
-        postalCode: String,
-        country: { type: String, default: 'Argentina' }
+    shippingCost: {
+        type: Number,
+        required: true
+    },
+    shippingMethod: {
+        type: String, 
+        default: 'Andreani'
+    },
+    shippingTrackingNumber: {
+        type: String,
+        required: false  
+    },
+    destinationPostalCode: {
+        type: String,
+        required: true
     },
     status: {
         type: String,
         enum: ['pendiente', 'procesando', 'enviado', 'entregado', 'cancelado'],
         default: 'pendiente'
     },
-    totalAmount: Number,
+    totalAmount: {
+        type: Number,
+        required: true
+    },
     payment: {
-        paymentId: String,
-        payment_type: String,
-        transaction_amount: Number,
-        status: String
+        type: Object,
+        required: true
     },
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    updatedAt: {
+        type: Date, 
+        default: Date.now
     }
+    
+});
+
+OrderSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
 });
 
 const Order = mongoose.model('Order', OrderSchema);

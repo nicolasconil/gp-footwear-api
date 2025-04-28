@@ -80,3 +80,17 @@ export const cancelMyOrder = async (req, res) => {
         res.status(500).json({ message: `Error al cancelar la compra: ${error.message} `});
     }
 };
+
+export const dispatchOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { shippingTrackingNumber } = req.body;
+        const updated = await OrderService.updateFields(id, {
+            status: 'enviado',
+            shippingTrackingNumber
+        });
+        res.status(200).json(updated);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+};

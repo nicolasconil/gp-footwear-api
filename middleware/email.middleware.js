@@ -43,3 +43,8 @@ export const sendOrderConfirmationEmail = async (email, orderId, pdfPath) => {
         ], 
     });
 };
+
+export const sendShippingNotificationEmail = async (email, name, orderId, trackingNumber, carrier) => {
+    const { subject, text, html } = sendShippingNotificationEmailTemplate (name, orderId, trackingNumber, carrier);
+    await sendEmail(email, subject, text, html);
+};

@@ -48,3 +48,10 @@ export const orderIdParamValidation = [
         .withMessage('El ID de la orden debe ser un parámetro válido'),
     handleValidationErrors
 ];
+
+export const dispatchOrderValidation = [
+    body('shippingTrackingNumber')
+        .notEmpty()
+        .withMessage('El número de seguimiento es obligatorio'),
+    handleValidationErrors
+];
