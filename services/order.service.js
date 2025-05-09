@@ -3,10 +3,11 @@ import { generateInvoice } from '../utils/invoiceGenerator.js';
 import { getShippingRate } from './carriers/andreani.service.js';
 import { sendOrderConfirmationEmail, sendShippingNotificationEmail } from '../middleware/email.middleware.js';
 import path from 'path';
+import { decryptText } from '../utils/encryption.js';
 
 export const create = async (orderData) => {
     const shippingCost = await getShippingRate(orderData.destinationPostalCode);
-    const order = await OrderRepository.createOrder({ ...orderData, shippingCost: shippingCost });
+    const order = await OrderRepository.createOrder({ ...orderData, shippingCost });
     try {
         const invoicePath = path.resolve(
             process.cwd(),
@@ -14,9 +15,10 @@ export const create = async (orderData) => {
             `factura-${order._id}.pdf`
         );
         await generateInvoice(order, invoicePath);
-        if (order.user) {
+        if (order.user && order.user.email) {
+            const decryptedEmail = decryptText(order.user.email); // desencripta el email
             await sendOrderConfirmationEmail(
-                order.user.email,
+                decryptedEmail,
                 order._id,
                 order.totalAmount,
                 invoicePath
@@ -62,9 +64,10 @@ export const updateFields = async (id, fields) => {
     const updateOrder = await OrderRepository.updateOrder(id, fields);
     if (fields.status && (fields.status === 'enviado' || fields.status === 'entregado')) {
         try {
-            if (updateOrder.user) {
+            if (updateOrder.user && updateOrder.user.email) {
+                const decryptedEmail = decryptText(updateOrder.user.email);
                 await sendShippingNotificationEmail (
-                    updateOrder.user.email,
+                    decryptedEmail,
                     updateOrder._id,
                     updateOrder.shippingTrackingNumber,
                     updateOrder.shippingMethod
@@ -83,9 +86,10 @@ export const dispatchOrder = async (id, shippingTrackingNumber) => {
         throw new Error('Orden no encontrada para despachar');
     }
     try {
-        if (order.user) {
+        if (order.user && order.user.email) {
+            const decryptedEmail = decryptText(order.user.email);
             await sendShippingNotificationEmail(
-                order.user.email,
+                decryptedEmail,
                 order._id,
                 order.shippingTrackingNumber,
                 order.shippingMethod

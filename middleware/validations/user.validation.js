@@ -16,6 +16,9 @@ export const registerUserValidation = [
         .optional()
         .isIn(['cliente', 'admin'])
         .withMessage('El rol debe ser "cliente" o "admin"'),
+    body('termsAccepted')
+        .equal('true')
+        .withMessage('Debes aceptar los términos y condiciones para registrarte'),
     handleValidationErrors
 ];
 

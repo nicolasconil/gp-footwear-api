@@ -12,6 +12,15 @@ import stockMovementRoute from './routes/stockMovement.route.js';
 import shippingRoute from './routes/shipping.route.js';
 import dotenv from 'dotenv';
 import path from 'path';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import ExpressMongoSanitize from 'express-mongo-sanitize';
+import xss from 'xss-clean';
+import { csrfProtection, addCsrfToken } from './middleware/csrf.middleware.js';
+import cookieParser from 'cookie-parser';
+import { requestLogger } from './middleware/requestLogger.middleware.js';
+import { limiter } from './middleware/ratelimit.middleware.js';
 
 dotenv.config();
 
@@ -19,8 +28,46 @@ const app = express();
 const port = process.env.PORT || 3000;
 const mongodb = process.env.MONGODB_URI;
 
+// configuración básica segura
+app.set('trust proxy', 1); // para que funcione bien detrás de proxies como Heroku, Nginx
+
+// middleware de seguridad
+app.use(helmet()); // protege cabeceras HTTP
+app.use(ExpressMongoSanitize()); // previene inyecciones NoSQL
+app.use(xss()); // limpia entradas contra XSS
+app.use(compression()); // comprime respuestas HTTP
+app.use(csrfProtection); // protección CSRF
+app.use(addCsrfToken); // middleware que agrega el token CSRF en las respuestas
+app.use(cookieParser());
+app.use(requestLogger);
+
+// logger HTTP
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+} else {
+    app.use(morgan('combined'));
+};
+
+app.use('/api', limiter); 
+
+// lectura segura de JSON
+app.use(express.json({ limit: '10kb' })); // límite para evitar grandes payloads maliciosos
+
+// forzar HTTPS solo en producción
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        if (req.secure || req.headers['x-forwared-proto'] === 'https') {
+            return next();
+        }
+        res.redirect('https://' + req.header.host + req.url);
+    });
+}1
+
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({ // CORS habilitado (ajustar orígenes en prod si es necesario)
+    origin: 'http://localhost:3000/api',
+    credentials: true
+})); 
 app.use('/invoices', express.static(path.join(process.cwd(), 'invoices')));
 app.use('/uploads', express.static(path.resolve('uploads')));
 

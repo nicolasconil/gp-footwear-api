@@ -8,8 +8,8 @@ export const getUserById = async (id) => {
     return await User.findById(id);
 };
 
-export const getUserByEmail = async (email) => {
-    return await User.findOne({ email });
+export const getUserByEmailHash = async (emailHash) => {
+    return await User.findOne({ emailHash });
 };
 
 export const createUser = async (data) => {

@@ -1,10 +1,17 @@
 import * as OrderService from '../services/order.service.js';
+import * as AuthService from '../services/auth.service.js';
 
 export const createOrder = async (req, res) => {
     try {
+        let userId = req.user?._id || null;
+        if (!userId) { // si no hay usuario autenticado, crea uno invitado
+            const { address, phone } = req.body;
+            const guestUser = await AuthService.createGuestUser({ address, phone });
+            userId = guestUser._id;
+        }
         const orderData = {
             ...req.body,
-            user: req.user?._id || null
+            user: userId
         };
         const order = await OrderService.create(orderData);
         res.status(201).json(order);

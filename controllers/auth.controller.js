@@ -6,10 +6,18 @@ import { sendVerificationEmail } from '../middleware/email.middleware.js';
 export const registerUser = async (req, res) => {
     try {
         const { email, password, name, role = 'cliente' } = req.body;
-        const user = await AuthService.registerUser({ email, password, name, role });
-        const verificationToken = generateToken(user._id, user.role);
-        const verificationUrl = `http://localhost:3000/verify-email/${verificationToken}`;
-        await sendVerificationEmail(user.email, verificationUrl);
+        const user = await AuthService.registerUser({ email, password, name, role }); // crea el usuario
+        const verificationToken = generateToken(user._id, user.role); //
+        const verificationUrl = `http://localhost:3000/verify-email/${verificationToken}`; // en esas 3 porciones de código se manda el email de verificación
+        await sendVerificationEmail(user.email, verificationUrl); //
+        const token = generateToken(user._id, user.role); // se genera el token de sesión (para cookie)
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: 60 * 60 * 1000,
+            path: '/'
+        });
         res.status(201).json({ message: 'Usuario registrado, verifica tu correo' });
     } catch (error) {
         res.status(400).json({ message: error.message });
@@ -19,13 +27,34 @@ export const registerUser = async (req, res) => {
 export const authenticateUser = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await AuthService.authenticateUser(email, password);
-        const token = generateToken(user._id, user.role);
-        res.status(200).json({ message: 'Autenticación exitosa', token });
+        const user = await AuthService.authenticateUser(email, password); // verifica si existe el usuario y si la contraseña es correcta
+        const token = generateToken(user._id, user.role); // genera el token
+        res.cookie('token', token, { // guarda el token en una cookie segura
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            maxAge: 60 * 60 * 1000,
+            path: '/'
+        });
+        res.status(200).json({ message: 'Autenticación exitosa' });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
+
+export const logoutUser = async (req, res) => {
+    try {
+        res.clearCookie('token', { // elimina el token guardado en la cookie   
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'Strict',
+            path: '/'
+        });
+        res.status(200).json({ message: 'Sesión cerrada con éxito' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al cerrar sesión', error });
+    }
+}
 
 export const verifyEmail = async (req, res) => {
     try {

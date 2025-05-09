@@ -1,22 +1,32 @@
 import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
 
 const UserSchema = new mongoose.Schema({
+    isGuest: {
+        type: Boolean,
+        default: false // <- 'true' si es un usuario anónimo
+    },
     fullName: {
-        type: String,
+        type: String, // encriptado con AES manualmente en el auth.service.js
         trim: true,
-        minlength: 3
+        minlength: 3,
+        required: false // <- no obligatorio para compras como invitado
     },
     email: {
-        type: String,
-        unique: true,
+        type: String, // encriptado con AES 
+        unique: false, // puede haber múltiples invitados sin email
         lowercase: true,
         trim: true,
-        match: [/^\S+@\S+\.\S+$/, 'Email inválido']
+        match: [/^\S+@\S+\.\S+$/, 'Email inválido'],
+        required: false
+    },
+    emailHash: {
+        type: String, // SHA-256 para búsquedas
+        required: false // sólo se usa si hay un email
     },
     password: {
         type: String,
-        minlength: 6
+        minlength: 6,
+        required: false // validado condicionalmente
     },
     isEmailVerified: {
         type: Boolean, 
@@ -27,7 +37,7 @@ const UserSchema = new mongoose.Schema({
         enum: ['cliente', 'admin'],
         default: 'cliente'
     },
-    address: {
+    address: { // encriptado
         street: { type: String, default: '' },
         number: { type: String, default: '' },
         floor: { type: String, default: '' },
@@ -43,7 +53,7 @@ const UserSchema = new mongoose.Schema({
             default: '+54',
             match: [/^\+\d{1,4}$/, 'Código de país inválido']
         },
-        number: {
+        number: { // encriptado
             type: String,
             default: '',
             match: [/^\d{6,15}$/, 'Número de teléfono inválido']
@@ -62,26 +72,57 @@ const UserSchema = new mongoose.Schema({
         }
     ],
     verificationToken: String,
-    verificationExpires: {
-        type: Date
-    },
+    verificationExpires: Date,
     resetPasswordToken: String,
-    resetPasswordExpires: String,
+    resetPasswordExpires: Date,
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    termsAccepted: {
+        type: Boolean,
+        required: false, // sólo es obligatorio si es un usuario registrado.
+        default: false
+    },
+    termsAcceptedAt: {
+        type: Date,
+        required: false
+    },
+    consent: {
+        cookies: {
+            type: Boolean,
+            default: false
+        },
+        newsletter: {
+            type: Boolean,
+            default: false
+        },
+        acceptedAt: {
+            type: Date
+        }
     }
 });
 
-UserSchema.pre('save', async function (next) {
-    if (!this.isModified('password')) return next();
-    try {
-        const salt = await bcrypt.genSalt(10);
-        this.password = await bcrypt.hash(this.password, salt);
-        return next();
-    } catch (error) {
-        return next(error);
+UserSchema.pre('validate', function (next) {
+    if(!this.isGuest) {
+        if (!this.email) return next(new Error('El email es requerido para usuarios registrados.'));
+        if (!this.password) return next(new Error('La contraseña es requerida  para usuarios registrados.'));
+        if (!this.termsAccepted) return next(new Error('Debes acordar los términos y condiciones.'));
+    } else {
+        const hasPersonalData = // invitado con datos sensibles
+            this.fullName || this.email || this.phone?.number || this.address?.street;
+        if (hasPersonalData && !this.termsAccepted) {
+            return next(new Error('Debes aceptar la política de privacidad para continuar como invitado.'));
+        }
     }
+    next();
+});
+
+UserSchema.pre('save', function (next) {
+    if (this.isModified('termsAccepted') && this.termsAccepted && !this.termsAcceptedAt) {
+        this.termsAcceptedAt = new Date();
+    }
+    next();
 });
 
 const User = mongoose.model('User', UserSchema);

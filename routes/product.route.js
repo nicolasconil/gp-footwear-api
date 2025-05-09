@@ -3,6 +3,7 @@ import * as ProductController from '../controllers/product.controller.js';
 import { createProductValidation, updateProductValidation } from '../middleware/validations/product.validation.js';
 import { verifyToken, verifyAdmin } from '../middleware/auth.middleware.js';
 import upload from '../middleware/upload.middleware.js';
+import { csrfProtection } from '../middleware/csrf.middleware.js';
 
 const router = express.Router();
 
@@ -91,7 +92,7 @@ router.get('/products/:id', ProductController.getById);
  *       201:
  *         description: Producto creado
  */
-router.post('/products', verifyToken, verifyAdmin, createProductValidation, upload.single('image'), ProductController.create);
+router.post('/products', verifyToken, verifyAdmin, csrfProtection, createProductValidation, upload.single('image'), ProductController.create);
 
 /**
  * @swagger
@@ -132,7 +133,7 @@ router.post('/products', verifyToken, verifyAdmin, createProductValidation, uplo
  *       200:
  *         description: Producto actualizado
  */
-router.put('/products/:id', verifyToken, verifyAdmin, updateProductValidation, upload.single('image'), ProductController.update);
+router.put('/products/:id', verifyToken, verifyAdmin, csrfProtection, updateProductValidation, upload.single('image'), ProductController.update);
 
 /**
  * @swagger
@@ -151,7 +152,7 @@ router.put('/products/:id', verifyToken, verifyAdmin, updateProductValidation, u
  *       204:
  *         description: Producto eliminado
  */
-router.delete('/products/:id', verifyToken, verifyAdmin, ProductController.remove);
+router.delete('/products/:id', verifyToken, verifyAdmin, csrfProtection, ProductController.remove);
 
 /**
  * @swagger
@@ -181,6 +182,6 @@ router.delete('/products/:id', verifyToken, verifyAdmin, ProductController.remov
  *       200:
  *         description: Stock reducido
  */
-router.patch('/products/:id/reduce-stock', verifyToken, verifyAdmin, ProductController.reduceStock);
+router.patch('/products/:id/reduce-stock', verifyToken, verifyAdmin, csrfProtection, ProductController.reduceStock);
 
 export default router;

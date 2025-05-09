@@ -1,7 +1,8 @@
 import Order from '../models/order.model.js';
 
 export const createOrder = async (data) => {
-    return await Order.create(data);
+    const newOrder = await Order.create(data);
+    return await Order.findById(newOrder._id).populate('user').populate('products.product');
 };
 
 export const getAllOrders = async () => {

@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
-const secretKey = 'betaecommerce';
+const secretKey = process.env.SECRET_KEY;
 
 export const generateToken = (userId, role) => {
     return jwt.sign({ id: userId, role: role }, secretKey, { expiresIn: '1h' });
 };
 
 export const verifyToken = (req, res, next) => {
-    const token = req.header('Authorization')?.split(' ')[1];
+    const token = req.cookies?.token || req.header('Authorization')?.split(' ')[1]; // busca primero en cookies y después en 'Authorization' de header
     if (!token) {
         res.status(403).json({ message: 'Acceso denegado' });
     }
