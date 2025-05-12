@@ -53,3 +53,20 @@ export const decryptUserFields = (user) => { // desencripta el usuario (email, n
     };
 };
 
+export const encryptGuestInfo = (guest = {}) => {
+    return {
+        fullName: guest.fullName ? encryptText(guest.fullName) : guest.fullName,
+        email: guest.email ? encryptText(guest.email) : guest.email,
+        phone: encryptPhone(guest.phone),
+        address: encryptAddress(guest.address)
+    };
+};
+
+export const decryptGuestInfo = (guest = {}) => {
+    return {
+        fullName: guest.fullName ? decryptText(guest.fullName) : guest.fullName,
+        email: guest.email ? decryptText(guest.email) : guest.email,
+        phone: decryptPhone(guest.phone),
+        address: decryptAddress(guest.address)
+    };
+};

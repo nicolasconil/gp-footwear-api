@@ -2,15 +2,15 @@ import Order from '../models/order.model.js';
 
 export const createOrder = async (data) => {
     const newOrder = await Order.create(data);
-    return await Order.findById(newOrder._id).populate('user').populate('products.product');
+    return await Order.findById(newOrder._id).populate('user').populate('products.product').populate('shipping');
 };
 
 export const getAllOrders = async () => {
-    return await Order.find().populate('user').populate('products.product');
+    return await Order.find().populate('user').populate('products.product').populate('shipping');
 };
 
 export const getOrderById = async (id) => {
-    return await Order.findById(id).populate('user').populate('products.product');
+    return await Order.findById(id).populate('user').populate('products.product').populate('shipping');
 };
 
 export const updateOrderStatus = async (id, status) => {
@@ -22,7 +22,7 @@ export const deleteOrder = async (id) => {
 };
 
 export const getOrdersByUserId = async (userId) => {
-    return await Order.find({ user: userId}).populate('user').populate('products.product');
+    return await Order.find({ user: userId}).populate('user').populate('products.product').populate(shipping);
 };
 
 export const updateOrder = async (id, updateData) => {

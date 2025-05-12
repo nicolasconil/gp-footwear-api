@@ -20,21 +20,10 @@ const OrderSchema = new mongoose.Schema({
         color: String,
         price: Number
     }],
-    shippingCost: {
-        type: Number,
-        required: true
-    },
-    shippingMethod: {
-        type: String, 
-        default: 'Andreani'
-    },
-    shippingTrackingNumber: {
-        type: String,
-        required: false  
-    },
-    destinationPostalCode: {
-        type: String,
-        required: true
+    shipping: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Shipping',
+        required: false
     },
     status: {
         type: String,
