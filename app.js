@@ -10,6 +10,7 @@ import authRoute from './routes/auth.route.js';
 import orderRoute from './routes/order.route.js';
 import stockMovementRoute from './routes/stockMovement.route.js';
 import shippingRoute from './routes/shipping.route.js';
+import reviewRoute from './routes/review.route.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import helmet from 'helmet';
@@ -109,6 +110,7 @@ app.use('/auth', authRoute);
 app.use('/orders', orderRoute);
 app.use('/', stockMovementRoute);
 app.use('/api/shipping', shippingRoute);
+app.use('api/review', reviewRoute);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada' });
