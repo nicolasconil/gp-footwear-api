@@ -6,16 +6,35 @@ API RESTful para gestionar el e-commerce de calzado "GP Footwear". Esta API perm
 
 ## 🚀 Tecnologías
 
-- Node.js
-- Express
-- MongoDB + mongoose
-- Swagger (documentación)
-- JWT (autenticación)
+- Node.js + Express (framework backend)
+- MongoDB + mongoose (base de datos NoSQL)
+- Swagger (documentación de la API)
+- JWT (autenticación segura)
 - Multer (subida de imágenes)
 - Mercado Pago (integración de pagos)
 - Nodemailer (notificaciones por correo)
-- PDFKit (facturación)
+- PDFKit (generación de facturas en PDF)
 - dotenv (variables de entorno)
+- bcrypt (hashing de contraseñas)
+- crypto (cifrado AES de datos personales) 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 🔒 Seguridad y cumplimiento
+
+- Protección CSRF (`csurf`)
+- Protección contra XSS (`xss-clean`)
+- Limpieza de datos maliciosos (`express-mongo-sanitize`)
+- Límite de peticiones (`express-rate-limit`)
+- Seguridad de headers HTTP (`helmet`)
+- Cookies seguras (`cookie-parser`)
+- Cifrado de datos sensibles en reposo (nombre, dirección, email, etc.)
+- Exportación de datos personales en PDF, CSV y JSON
+- Gestión de consentimiento y privacidad (GDPR-ready)
+- Logs de auditoria (`winston`)
+- Sistema de backups
+- Protección contra fuerza bruta como bloqueo temporal
+- Headers HTTP configurados (deshabilita `X-Powered-By`, define `Content-Security-Policy`)
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -68,29 +87,33 @@ Ahí podes ver y probar todos los endpoints de la API.
 
 ## 📁 Estructura del proyecto
 
-├── controllers/
-├── middleware/
-├── models/
-├── repositories/
-├── routes/
-├── services/
-├── utils/
-├── invoices/
-├── uploads/
-├── .env
-├── app.js
+├── controllers/            # Lógica de los endpoints
+├── middleware/             # Autenticación, validaciones, protección
+├── models/                 # Esquemas de Mongoose
+├── repositories/           # Abstracción de acceso de datos
+├── routes/                 # Rutas express agrupadas
+├── services/               # Lógica de negocio
+├── utils/                  # Utilidades (cifrado, validaciones, envío de correos, etc.)
+├── invoices/               # Facturas generadas en PDF
+├── uploads/                # Imágenes subidas por Multer
+├── .env                    # Punto de entrada principal
+├── app.js                  # Variables de entorno
 ├── README.md
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## 🧪 Endpoints principales
 
-- /api/products: Productos
-- /auth: Autenticación (login/register)
-- /user: Gestión de usuarios
-- /orders: Pedidos
-- /invoices: Acceso a facturas PDF
-- /uploads: Imágenes subidas
+- /products: Gestión de productos (CRUD, stock, variaciones por talle/color, imagen)
+- /auth: Autenticación y autorización (JWT, recuperación de contraseña, verificación por email)
+- /user: Gestión de usuarios (registro, login, perfil, verificación, roles)
+- /orders: Gestión de pedidos (seguimiento, actualización de estado, historial)
+- /invoices: Generación y descarga de facturas PDF
+- /uploads: Subidas de imágenes para productos
+- /payments: Pago con Mercado Pago, RapiPago, PagoFácil, transferencias bancarias 
+- /webhook: Webhook para actualización automática del estado de pago desde Mercado Pago
+- /newsletter: Suscripción a newsletter y envío de correos automáticos (EmailJS o Nodemail)
+- /data: Exportación de datos personales (PDF, CSV, JSON)
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 

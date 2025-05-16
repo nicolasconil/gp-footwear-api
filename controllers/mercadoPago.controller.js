@@ -1,4 +1,5 @@
 import * as MPService from '../services/mercadoPago.service.js';
+import * as OrderService from '../services/order.service.js';
 
 // crear preferencia de pago
 export const createPreference = async (req, res) => {
@@ -22,10 +23,26 @@ export const createPreference = async (req, res) => {
 // webhook para recibir notificaciones de Mercado Pago
 export const webhookNotification = async (req, res) => {
     try {
-        const paymentInfo = req.query; // Mercado Pago envía los datos en query
-        if (paymentInfo.type == 'payment') {
-            const paymentId = paymentInfo['data.id'];
-            await MPService.processPaymentNotification(paymentId);
+        let paymentId;
+        let type;
+        if (req.method === 'GET') {
+            paymentId = req.query['data.id'];
+            type = req.query.type;
+        } else if (req.method === 'POST') {
+            paymentId = req.body.data?.id;
+            type = req.body.type;
+        }
+        if (type === 'payment' && paymentId) {
+            const mpPayment = await MPService.processPaymentNotification(paymentId);
+            const status = mpPayment.status;
+            const orderId = mpPayment.external_reference;
+            if (!orderId) {
+                return res.status(400).json({ message: 'Webhook recibido sin external_reference', error: error.message });
+            }
+            if (status === 'approved') {
+                const order = await OrderService.updateStatus(orderId, 'pagado');
+                
+            }
         }
         res.sendStatus(200); // IMPORTANTE: siempre responder 200 (OK) para que Mercado Pago no vuelva a intentar.
     } catch (error) {

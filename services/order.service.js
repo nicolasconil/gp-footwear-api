@@ -6,7 +6,6 @@ import path from 'path';
 import { decryptText } from '../utils/encryption.js';
 
 export const create = async (orderData) => {
-    const shippingCost = await getShippingRate(orderData.destinationPostalCode);
     const order = await OrderRepository.createOrder({ ...orderData, shippingCost });
     try {
         const invoicePath = path.resolve(
@@ -57,7 +56,11 @@ export const updatePaymentInfo = async (orderId, paymentInfo) => {
         status: paymentInfo.status,
         payment: paymentInfo
     };
-    return await OrderRepository.updateOrder(orderId, updateData);    
+    const updatedOrder = await OrderRepository.updateOrder(orderId, updateData);
+    if (oaymentInfo.status === 'approved') {
+        await processAfterOrder(updatedOrder);
+    }
+    return updatedOrder;    
 };
 
 export const updateFields = async (id, fields) => {
@@ -99,4 +102,26 @@ export const dispatchOrder = async (id, shippingTrackingNumber) => {
         console.error('Error enviando email de despacho: ', error);
     }
     return order;
+};
+
+export const processAfterOrder = async (order) => {
+    try {
+        const invoicePath = path.resolve(
+            proccess.cwd(),
+            'invoices',
+            `factura-${order._id}.pdf`
+        );
+        await generateInvoice(order, invoicePath);
+        if (order.user && order.user.email) {
+            const decryptedEmail = decryptText(order.user.email);
+            await sendOrderConfirmationEmail(
+                decryptedEmail,
+                order._id,
+                order.totalAmount,
+                invoicePath
+            );
+        }
+    } catch (error) {
+        console.error('Error en el processAfterOrder', error);
+    }
 }

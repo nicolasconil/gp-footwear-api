@@ -1,5 +1,4 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import swaggerJSDoc from 'swagger-jsdoc';
@@ -11,6 +10,7 @@ import orderRoute from './routes/order.route.js';
 import stockMovementRoute from './routes/stockMovement.route.js';
 import shippingRoute from './routes/shipping.route.js';
 import reviewRoute from './routes/review.route.js';
+import paymentRoute from './routes/payment.route.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import helmet from 'helmet';
@@ -51,8 +51,9 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use('/api', limiter); 
 
-// lectura segura de JSON
+// lectura segura de JSON y formularios
 app.use(express.json({ limit: '10kb' })); // límite para evitar grandes payloads maliciosos
+app.use(express.urlencoded({ extended: true }));
 
 // forzar HTTPS solo en producción
 if (process.env.NODE_ENV === 'production') {
@@ -62,9 +63,8 @@ if (process.env.NODE_ENV === 'production') {
         }
         res.redirect('https://' + req.header.host + req.url);
     });
-}1
+}
 
-app.use(bodyParser.json());
 app.use(cors({ // CORS habilitado (ajustar orígenes en prod si es necesario)
     origin: 'http://localhost:3000/api',
     credentials: true
@@ -104,13 +104,14 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/api', productRoute);
+app.use('/', productRoute);
 app.use('/user', userRoute);
 app.use('/auth', authRoute);
 app.use('/orders', orderRoute);
-app.use('/', stockMovementRoute);
-app.use('/api/shipping', shippingRoute);
-app.use('api/review', reviewRoute);
+app.use('/stock-movement', stockMovementRoute);
+app.use('/shipping', shippingRoute);
+app.use('/review', reviewRoute);
+app.use('/payment', paymentRoute);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada' });

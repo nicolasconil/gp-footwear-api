@@ -44,14 +44,13 @@ export const createPaymentPreference = async ({ products, orderId, email}) => {
 export const processPaymentNotification = async (paymentId) => {
     try {
         const payment = await mercadopago.payment.findById(paymentId);
-        const status = payment.body.status;
-        const externalReference = payment.body.external_reference;
+        const { status, payment_type_id, transaction_amount, external_reference } = payment.body;
         console.log(
             `📦 Pago recibido:
             🆔 ID: ${paymentId}
             🧾 Orden: ${externalReference}
             💳 Estado: ${status}`);
-        await OrderService.updatePaymentInfo(externalReference, {
+        await OrderService.updatePaymentInfo(external_reference, {
             paymentId,
             payment_type: payment_type_id,
             transaction_amount,
@@ -59,7 +58,7 @@ export const processPaymentNotification = async (paymentId) => {
         });
         return {
             status,
-            orderId: externalReference
+            orderId: external_reference
         }
     } catch (error) {
         console.error('Error al procesar la notificación de pago: ', error.message);

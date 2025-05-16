@@ -22,9 +22,10 @@ export const deleteOrder = async (id) => {
 };
 
 export const getOrdersByUserId = async (userId) => {
-    return await Order.find({ user: userId}).populate('user').populate('products.product').populate(shipping);
+    return await Order.find({ user: userId}).populate('user').populate('products.product').populate('shipping');
 };
 
 export const updateOrder = async (id, updateData) => {
-    return await Order.findByIdAndUpdate(id, updateData, { new: true });
+    await Order.findByIdAndUpdate(id, updateData);
+    return await Order.findById(id).populate('user').populate('products.product').populate('shipping');
 };
