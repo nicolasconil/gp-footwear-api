@@ -111,7 +111,6 @@ Ahí podes ver y probar todos los endpoints de la API.
 - /invoices: Generación y descarga de facturas PDF
 - /uploads: Subidas de imágenes para productos
 - /payments: Pago con Mercado Pago, RapiPago, PagoFácil, transferencias bancarias 
-- /webhook: Webhook para actualización automática del estado de pago desde Mercado Pago
 - /newsletter: Suscripción a newsletter y envío de correos automáticos (EmailJS o Nodemail)
 - /data: Exportación de datos personales (PDF, CSV, JSON)
 
@@ -138,9 +137,8 @@ RESTful API to manage the e-commerce platform for "GP Footwear". This API allows
 
 ## 🚀 Technologies
 
-- Node.js
-- Express
-- MongoDB + mongoose
+- Node.js + Express (backend framework)
+- MongoDB + mongoose (NoSQL database)
 - Swagger (API documentation)
 - JWT (authentication)
 - Multer (image upload)
@@ -148,6 +146,26 @@ RESTful API to manage the e-commerce platform for "GP Footwear". This API allows
 - Nodemailer (email notifications)
 - PDFKit (invoice generation)
 - dotenv (environment variables)
+- bcrypt (password hashing)
+- crypto (AES encryption for personal data)
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+## 🔒 Security and Compliance
+
+- CSRF protection (`csurf`)
+- XSS protection (`xss-clean`)
+- Malicious data cleaning (`express-mongo-sanitize`)
+- Request limiting (`express-rate-limit`)
+- HTTP Header Security (`helmet`)
+- Secure cookies (`cookie-parser`)
+- Sensitive data encryption at Rest (name, address, email, etc.)
+- Personal data export in PDF, CSV and JSON formats
+- Consent and privacy management (GDPR-ready)
+- Audit logs (`winston`)
+- Backup system
+- Brute force protection (temporary lockout)
+- HTTP Headers configured (disables `X-Powered-By`, defines `Content-Security-Policy`)
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -200,29 +218,32 @@ You can explore and test all available API endpoints.
 
 ## 📁 Project Structure
 
-├── controllers/
-├── middleware/
-├── models/
-├── repositories/
-├── routes/
-├── services/
-├── utils/
-├── invoices/
-├── uploads/
-├── .env
-├── app.js
+├── controllers/            # Endpoint logic        
+├── middleware/             # Authentication, validations, protection
+├── models/                 # Mongoose schemas
+├── repositories/           # Data access abstraction
+├── routes/                 # Grouped express routes
+├── services/               # Business logic
+├── utils/                  # Utilities (encryption, validations, email, sending, etc.)
+├── invoices/               # Generated PDF invoices
+├── uploads/                # Uploaded images via Multer
+├── .env                    # Main environment file 
+├── app.js                  # Environment variables
 ├── README.md
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## 🧪 Main Endpoints
 
-- /api/products: Product management 
-- /auth: Authentication (login/register)
-- /user: User management
-- /orders: Orders
-- /invoices: Access PDF invoices
-- /uploads: Uploaded images
+- /products: Product management (CRUD, stock, size/color variations, images) 
+- /auth: Authentication and authorization (JWT, password recovery, email verification)
+- /user: User management (registration, login, profile, verification, roles)
+- /orders: Orders management (tracking, status updates, history)
+- /invoices: Generate and download PDF invoices
+- /uploads: Product images uploads
+- /payments: Payments via Mercado Pago, RapiPago, PagoFácil, bank transfers
+- /newsletter: Newsletter subscription and email notification (EmailJS or Nodemailer)
+- /data: Export personal data (PDF, CSV, JSON)
 
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
