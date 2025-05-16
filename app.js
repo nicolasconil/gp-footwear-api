@@ -28,11 +28,11 @@ import { limiter } from './middleware/ratelimit.middleware.js';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
 const mongodb = process.env.MONGODB_URI;
 
 // configuración básica segura
 app.set('trust proxy', 1); // para que funcione bien detrás de proxies como Heroku, Nginx
+app.disable('x-powered-by');
 
 // middleware de seguridad
 app.use(helmet()); // protege cabeceras HTTP
@@ -60,19 +60,27 @@ app.use(express.urlencoded({ extended: true }));
 // forzar HTTPS solo en producción
 if (process.env.NODE_ENV === 'production') {
     app.use((req, res, next) => {
-        if (req.secure || req.headers['x-forwared-proto'] === 'https') {
+        if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
             return next();
         }
         res.redirect('https://' + req.header.host + req.url);
     });
 }
 
+const allowedOrigins = [process.env.FRONTEND_URL];;
+
 app.use(cors({ // CORS habilitado (ajustar orígenes en prod si es necesario)
-    origin: 'http://localhost:3000/api',
+    origin: function (origin, callback) {
+        if (!origin) return callback (null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error('Not allowed by CORS'))
+    },
     credentials: true
 })); 
 app.use('/invoices', express.static(path.join(process.cwd(), 'invoices')));
-app.use('/uploads', express.static(path.resolve('uploads')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 mongoose.connect(mongodb)
 .then(() => console.log('MongoDB connected to GP Footwear'))
@@ -106,16 +114,16 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use('/', productRoute);
-app.use('/user', userRoute);
-app.use('/auth', authRoute);
-app.use('/orders', orderRoute);
-app.use('/stock-movement', stockMovementRoute);
-app.use('/shipping', shippingRoute);
-app.use('/review', reviewRoute);
-app.use('/payment', paymentRoute);
-app.use('/newsletter', newsletterRoute);
-app.use('/data', dataRoute);
+app.use('/api/products', productRoute);
+app.use('/api/user', userRoute);
+app.use('/api/auth', authRoute);
+app.use('/api/orders', orderRoute);
+app.use('/api/stock-movement', stockMovementRoute);
+app.use('/api/shipping', shippingRoute);
+app.use('/api/review', reviewRoute);
+app.use('/api/payment', paymentRoute);
+app.use('/api/newsletter', newsletterRoute);
+app.use('/api/data', dataRoute);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada' });
@@ -129,6 +137,4 @@ app.use((error, req, res, next) => {
     });
 });
 
-app.listen(port, () => {
-    console.log(`Server is running in port ${port}.`);
-});
+export default app;
