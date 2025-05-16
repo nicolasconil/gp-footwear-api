@@ -11,6 +11,7 @@ import stockMovementRoute from './routes/stockMovement.route.js';
 import shippingRoute from './routes/shipping.route.js';
 import reviewRoute from './routes/review.route.js';
 import paymentRoute from './routes/payment.route.js';
+import newsletterRoute from './routes/newsletter.route.js';
 import dotenv from 'dotenv';
 import path from 'path';
 import helmet from 'helmet';
@@ -112,6 +113,7 @@ app.use('/stock-movement', stockMovementRoute);
 app.use('/shipping', shippingRoute);
 app.use('/review', reviewRoute);
 app.use('/payment', paymentRoute);
+app.use('/newsletter', newsletterRoute);
 
 app.use((req, res, next) => {
     res.status(404).json({ message: 'Ruta no encontrada' });

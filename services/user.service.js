@@ -76,3 +76,11 @@ export const updateConsent = async (userId, consentData) => {
     await user.save();
     return user;
 }
+
+export const getSubscribers = async () => {
+    try {
+        return await UserRepository.getSubscribers();
+    } catch (error) {
+        throw new Error('Error en el servicio de suscripciones', error.message);
+    }
+};

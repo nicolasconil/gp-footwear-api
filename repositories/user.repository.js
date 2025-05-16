@@ -35,3 +35,12 @@ export const findByResetToken = async (token) => {
         resetPasswordExpires: { $gt: Date.now() }
     });
 };
+
+export const getSubscribers = async () => {
+    try {
+        const subscribers = await User.find({ 'consent.newsletter': true }).select('email');
+        return subscribers.map(user => user.email);
+    } catch (error) {
+        throw new Error('Error al obtener los suscriptos al newsletter', error.message); 
+    }
+};
