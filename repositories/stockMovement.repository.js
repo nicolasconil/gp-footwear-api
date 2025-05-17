@@ -1,4 +1,4 @@
-import StockMovement from "../models/stockMovement.js";
+import StockMovement from "../models/stockMovement.model.js";
 
 export const createStockMovement = async (data) => {
     const movement = new StockMovement(data);

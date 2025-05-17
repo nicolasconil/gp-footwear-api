@@ -13,7 +13,6 @@ import reviewRoute from './routes/review.route.js';
 import paymentRoute from './routes/payment.route.js';
 import newsletterRoute from './routes/newsletter.route.js';
 import dataRoute from './routes/data.route.js';
-import dotenv from 'dotenv';
 import path from 'path';
 import helmet from 'helmet';
 import compression from 'compression';
@@ -25,7 +24,6 @@ import cookieParser from 'cookie-parser';
 import { requestLogger } from './middleware/requestLogger.middleware.js';
 import { limiter } from './middleware/ratelimit.middleware.js';
 
-dotenv.config();
 
 const app = express();
 const mongodb = process.env.MONGODB_URI;

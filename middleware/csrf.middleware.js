@@ -1,6 +1,6 @@
 import csurf from "csurf";
 
-const csrfProtection = csurf({
+export const csrfProtection = csurf({
     cookie: {
         httpOnly: true, // no accesible para java script
         secure: process.env.NODE_ENV === 'production', // solo por HTTPS en producción
@@ -8,12 +8,11 @@ const csrfProtection = csurf({
     }
 });
 
-const addCsrfToken = (req, res, next) => {
+export const addCsrfToken = (req, res, next) => {
     try {
         res.locals.csrfToken = req.csrfToken();
     } catch (error) {
         return res.status(403).json({ message: 'No se pudo generar el token CSRF' });
     }
     next();
-}
-export default { csrfProtection, addCsrfToken };
+};

@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import crypto from 'crypto';
 
 const ENCRYPTION_KEY = process.env.ADDRESS_ENCRYPTION_KEY;

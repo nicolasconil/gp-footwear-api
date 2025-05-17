@@ -1,6 +1,5 @@
 import * as OrderRepository from '../repositories/order.repository.js';
 import { generateInvoice } from '../utils/invoiceGenerator.js';
-import { getShippingRate } from './carriers/andreani.service.js';
 import { sendOrderConfirmationEmail, sendShippingNotificationEmail } from '../middleware/email.middleware.js';
 import path from 'path';
 import { decryptText } from '../utils/encryption.js';

@@ -1,9 +1,6 @@
 import mercadopago from 'mercadopago';
 import * as OrderService from '../services/order.service.js';
-import path from 'path';
-import { decryptText } from '../utils/encryption.js';
-import { generateInvoice } from '../utils/invoiceGenerator.js';
-import { sendOrderConfirmationEmail } from '../middleware/email.middleware.js';
+
 
 export const createManualPreference = async ({ products, email, orderId }) => {
     const items = products.map((product) => ({

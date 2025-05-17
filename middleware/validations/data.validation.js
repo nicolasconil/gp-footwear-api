@@ -1,5 +1,5 @@
 import { query } from "express-validator";
-import { handleValidationErrors } from "./handleErrors.validation,js";
+import { handleValidationErrors } from "./handleErrors.validation.js";
 
 export const exportFormatValidation = [
     query('format')

@@ -6,7 +6,8 @@ export const reviewValidation = [
         .isInt({ min: 1, max: 5 }).withMessage('La calificación debe estar entre 1 y 5'),
     body('comment')
         .optional()
-        .trim().withMessage('El comnetario no puede estar vacío')
+        .trim()
+        .notEmpty().withMessage('El comentario no puede estar vacío')
         .isLength({ max: 500 }).withMessage('El comentario no debe superar los 500 caracteres'),
     body('product')
         .notEmpty().withMessage('El ID del producto es obligatorio')

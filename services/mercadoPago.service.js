@@ -1,10 +1,10 @@
-import mercadopago from 'mercadopago';
+import { MercadoPagoConfig } from 'mercadopago';
 import dotenv from 'dotenv';
 import * as OrderService from '../services/order.service.js';
 
 dotenv.config();
 
-mercadopago.configure({
+const mpConfig = new MercadoPagoConfig({
     access_token: process.env.MP_ACCESS_TOKEN
 });
 
@@ -30,7 +30,7 @@ export const createPaymentPreference = async ({ products, orderId, email}) => {
             auto_return: 'approved',
             notification_url: `${process.env.BACKEND_URL}/api/webhook/mercadopago`
         };
-        const result = await mercadopago.preferences.create(preference);
+        const result = await mpConfig.createPaymentPreference(preference);
         return {
             init_point: result.body.init_point,
             preferenceId: result.body.id
@@ -43,7 +43,7 @@ export const createPaymentPreference = async ({ products, orderId, email}) => {
 
 export const processPaymentNotification = async (paymentId) => {
     try {
-        const payment = await mercadopago.payment.findById(paymentId);
+        const payment = await mpConfig.payment.findById(paymentId);
         const { status, payment_type_id, transaction_amount, external_reference } = payment.body;
         console.log(
             `📦 Pago recibido:

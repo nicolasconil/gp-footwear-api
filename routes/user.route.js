@@ -14,3 +14,5 @@ router.delete('/:id', verifyToken, verifyAdmin, csrfProtection, UserController.d
 router.patch('/consent', verifyToken, csrfProtection, UserController.updateUserConsent);
 router.get('/export', verifyToken, csrfProtection, UserController.exportUserData); // exporta los datos del usuario autenticado
 router.delete('/me', verifyToken, csrfProtection, UserController.deleteAccount);
+
+export default router;
